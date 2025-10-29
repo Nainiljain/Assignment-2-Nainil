@@ -1,0 +1,42 @@
+<h1>Search Results by Name</h1>
+<p>Search query: "{{searchQuery}}"</p>
+
+{{#if found}}
+    <div class="search-results">
+        <h3>Found {{results.length}} properties</h3>
+        <div class="results-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Country</th>
+                        <th>Room Type</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each results}}
+                    <tr>
+                        <td>{{this.id}}</td>
+                        <td>{{this.NAME}}</td>
+                        <td>{{this.country}}</td>
+                        <td>{{this.room_type}}</td>
+                        <td>${{this.price}}</td>
+                        <td><a href="/data/{{@index}}" class="btn-small">View Details</a></td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{{else}}
+    <div class="no-results">
+        <h3>No matching properties found.</h3>
+    </div>
+{{/if}}
+<div class="navigation">
+    <a href="/search/name" class="btn">Search Again</a>
+    <a href="/data" class="btn">Back to Data Overview</a>
+</div>
