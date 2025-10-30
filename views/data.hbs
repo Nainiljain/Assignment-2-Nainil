@@ -1,10 +1,34 @@
-<h1>JSON Data Overview</h1>
-<div class="data-info">
-    <p>{{message}}</p>
-    <p><strong>Total Records:</strong> {{totalRecords}}</p>
-    <div class="actions">
-        <a href="/data/0" class="btn">View First Record</a>
-        <a href="/search/id" class="btn">Search by ID</a>
-        <a href="/search/name" class="btn">Search by Name</a>
-    </div>
-</div>
+<h2>All Airbnb Data</h2>
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Country</th>
+      <th>Property Type</th>
+      <th>Price</th>
+      <th>Neighbourhood</th>
+      <th>Cancellation Policy</th>
+      <th>Thumbnail</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each totalRecords}}
+      <tr>
+        <td>{{this.id}}</td>
+        <td>{{this.NAME}}</td>
+        <td>{{this.country}}</td>
+        <td>{{this.property_type}}</td>
+        <td>${{this.price}}</td>
+        <td>{{this.neighbourhood}}</td>
+        <td>{{this.cancellation_policy}}</td>
+        <td><img
+            src="{{this.thumbnail}}"
+            alt="Property Image"
+            width="100"
+          /></td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
