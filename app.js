@@ -3,8 +3,8 @@
  * * I declare that this assignment is my own work in accordance with Humber Academic Policy. 
  * * No part of this assignment has been copied manually or electronically from any other source 
  * * (including web sites) or distributed to other students.
- * * Name: Thabotharan Balachandran
- * * Student ID: N01674899
+ * * Name: Nainil Jain
+ * * Student ID: N01706081
  * * Date: 2025-10-29
  * ********************************************************************************/
 
@@ -102,7 +102,7 @@ app.get('/data', async (req, res) => {
             title: 'JSON Data - Express App',
             activePage: 'data',
             message: 'JSON data is loaded and ready!',
-            totalRecords: selectedData.length
+            totalRecords: selectedData
         });
     } catch (error) {
         res.render('error', {
@@ -115,21 +115,13 @@ app.get('/data', async (req, res) => {
 app.get('/data/:index', async (req, res) => {
     try {
         selectedData = await AirbnbData();
-        const idx = Number(req.params.index);
-
-        if (idx < 0 || idx >= selectedData.length) {
-            return res.render('error', {
-                title: 'Error - Invalid Index',
-                message: `Invalid index: ${idx}. Please use index between 0 and ${selectedData.length - 1}`
-            });
+        const index = parseInt(req.params.index);
+        if (!isNaN(index) && index >= 0 && index < selectedData.length) {
+            selectedData = [selectedData[index]];
+            res.render('data-record', { title: 'Search Property by Index', record: selectedData });
+        } else {
+            res.status(400).send("Invalid index!");
         }
-        
-        res.render('data-record', {
-            title: `Record ${idx} - Express App`,
-            activePage: 'data',
-            record: data[idx],
-            index: idx
-        });
     } catch (error) {
         res.render('error', {
             title: 'Error - Data Load Failed',
