@@ -56,12 +56,13 @@ let airbnbData = [];
 let selectedData = [];
 
 // Function to load data from remote URL
-async function getAirbnbData() {
+async function AirbnbData() {
     try {
-        const base = "https://cdn.jsdelivr.net/gh/balathabo1996/Airbnb-JSON/";
+        // ✅ Use the RAW GitHub link
+        const base = "https://raw.githubusercontent.com/Nainiljain/Assignment-2-Nainil-Database/master/";
         const indexUrl = base + "index.json";
 
-        // Fetch index file
+        // Fetch index.json
         const index = await (await fetch(indexUrl)).json();
 
         // Load all part files in parallel
@@ -69,10 +70,10 @@ async function getAirbnbData() {
             index.parts.map((file) => fetch(base + file).then((r) => r.json()))
         );
 
-        // Merge all arrays into one dataset
+        // Merge and return the full dataset
         return parts.flat();
     } catch (err) {
-        console.error("Failed to load Airbnb data:", err);
+        console.error("❌ Failed to load Airbnb data:", err);
         return [];
     }
 }
@@ -96,15 +97,12 @@ app.get('/users', function (req, res) {
 // JSON Data Routes
 app.get('/data', async (req, res) => {
     try {
-        const raw = await fs.readFile('airbnb.json', 'utf-8');
-        const data = JSON.parse(raw);
-        console.log(data); // print entire JSON in console
-        
+        selectedData = await AirbnbData();
         res.render('data', {
             title: 'JSON Data - Express App',
             activePage: 'data',
             message: 'JSON data is loaded and ready!',
-            totalRecords: data.length
+            totalRecords: selectedData.length
         });
     } catch (error) {
         res.render('error', {
@@ -116,14 +114,13 @@ app.get('/data', async (req, res) => {
 
 app.get('/data/:index', async (req, res) => {
     try {
+        selectedData = await AirbnbData();
         const idx = Number(req.params.index);
-        const raw = await fs.readFile('airbnb.json', 'utf-8');
-        const data = JSON.parse(raw);
-        
-        if (idx < 0 || idx >= data.length) {
+
+        if (idx < 0 || idx >= selectedData.length) {
             return res.render('error', {
                 title: 'Error - Invalid Index',
-                message: `Invalid index: ${idx}. Please use index between 0 and ${data.length - 1}`
+                message: `Invalid index: ${idx}. Please use index between 0 and ${selectedData.length - 1}`
             });
         }
         
@@ -159,11 +156,10 @@ app.get('/search/name', (req, res) => {
 // Search Results
 app.get("/search/id/result", async (req, res) => {
     try {
+        selectedData = await AirbnbData();
         const id = req.query.id;
-        const raw = await fs.readFile("airbnb.json", "utf-8");
-        const data = JSON.parse(raw);
 
-        const record = data.find((r) => String(r.id) === id);
+        const record = selectedData.find((r) => String(r.id) === id);
 
         res.render('search-id-result', {
             title: 'Search Results - Express App',
@@ -183,11 +179,10 @@ app.get("/search/id/result", async (req, res) => {
 
 app.get('/search/name/result', async (req, res) => {
     try {
+        selectedData = await AirbnbData();
         const q = req.query.q.toLowerCase();
-        const raw = await fs.readFile('airbnb.json', 'utf-8');
-        const data = JSON.parse(raw);
-        const results = data.filter(r => r.NAME && r.NAME.toLowerCase().includes(q));
-        
+        const results = selectedData.filter(r => r.NAME && r.NAME.toLowerCase().includes(q));
+
         res.render('search-name-result', {
             title: 'Search Results - Express App',
             activePage: 'search',
@@ -205,18 +200,18 @@ app.get('/search/name/result', async (req, res) => {
 
 // View all Airbnb data
 app.get('/viewData', async (req, res) => {
-    selectedData = await getAirbnbData();
+    selectedData = await AirbnbData();
     res.render('viewData', { title: 'View All Airbnb Filled Data', data: selectedData });
 });
 
 // Highlight rows with missing service fees
-app.get('/viewData/clean', async (req, res) => {
-    selectedData = await getAirbnbData();
+app.get('/viewDataClean', async (req, res) => {
+    selectedData = await AirbnbData();
     res.render('viewDataClean', { title: 'View All Airbnb Highlighted Data', data: selectedData });
 });
 
 // Filter by price range
-app.get('/viewData/price',
+app.get('/viewPrice',
     [
         query("min")
             .notEmpty()
@@ -240,7 +235,7 @@ app.get('/viewData/price',
         if (req.query.min && req.query.max && errors.isEmpty()) {
             const min = parseFloat(req.query.min);
             const max = parseFloat(req.query.max);
-            selectedData = await getAirbnbData();
+            selectedData = await AirbnbData();
 
             found = selectedData.filter((p) => {
                 const price = parseFloat((p.price || "0").replace(/[^0-9.]/g, ""));
